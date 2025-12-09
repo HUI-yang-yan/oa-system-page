@@ -4,6 +4,30 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Enterprise OA System</title>
+    
+    <!-- Global Error Handler -->
+    <script>
+      window.onerror = function(msg, src, line, col, error) {
+        console.error("Global Error:", msg, error);
+        const root = document.getElementById('root');
+        // If the app hasn't mounted after a failure, show a visible error
+        if (root && root.innerHTML.trim() === '') {
+             const div = document.createElement('div');
+             div.style.position = 'fixed';
+             div.style.top = '0';
+             div.style.left = '0';
+             div.style.width = '100%';
+             div.style.padding = '20px';
+             div.style.backgroundColor = '#fee2e2';
+             div.style.color = '#991b1b';
+             div.style.fontFamily = 'monospace';
+             div.style.zIndex = '9999';
+             div.innerHTML = '<h1>Application Failed to Start</h1><p>Check console for details.</p><pre>' + msg + '</pre>';
+             document.body.appendChild(div);
+        }
+      };
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -20,17 +44,23 @@
         }
       }
     </script>
+  
+  <!-- Critical Fix: Use stable React 18 and Router 6 versions -->
   <script type="importmap">
-{
-  "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+  {
+    "imports": {
+      "react": "https://aistudiocdn.com/react@18.3.1",
+      "react/": "https://aistudiocdn.com/react@18.3.1/",
+      "react-dom": "https://aistudiocdn.com/react-dom@18.3.1",
+      "react-dom/": "https://aistudiocdn.com/react-dom@18.3.1/",
+      "react-dom/client": "https://aistudiocdn.com/react-dom@18.3.1/client",
+      "react-router": "https://aistudiocdn.com/react-router@6.28.0",
+      "react-router-dom": "https://aistudiocdn.com/react-router-dom@6.28.0",
+      "@remix-run/router": "https://aistudiocdn.com/@remix-run/router@1.13.0",
+      "lucide-react": "https://aistudiocdn.com/lucide-react@0.294.0"
+    }
   }
-}
-</script>
+  </script>
 </head>
   <body class="bg-background text-slate-800 antialiased">
     <div id="root"></div>

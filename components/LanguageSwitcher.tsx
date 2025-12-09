@@ -12,11 +12,11 @@ const LanguageSwitcher: React.FC<Props> = ({ className = '' }) => {
   return (
     <button
       onClick={() => setLanguage(language === 'en' ? 'zh' : 'en')}
-      className={`flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-slate-200 shadow-sm text-sm font-medium text-slate-600 hover:text-primary hover:border-primary transition-all ${className}`}
-      title="Switch Language"
+      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 shadow-sm text-sm font-medium text-slate-700 hover:text-primary hover:border-primary hover:bg-slate-50 transition-all cursor-pointer select-none active:scale-95 ${className}`}
+      title={language === 'en' ? "Switch to Chinese" : "切换到英文"}
     >
-      <Globe size={16} />
-      <span>{language === 'en' ? 'EN' : '中文'}</span>
+      <Globe size={18} className="text-accent" />
+      <span>{language === 'en' ? 'English' : '中文'}</span>
     </button>
   );
 };

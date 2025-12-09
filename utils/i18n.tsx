@@ -194,18 +194,27 @@ const translations = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('zh'); // Default to Chinese
+  const [language, setLanguageState] = useState<Language>('zh');
 
   useEffect(() => {
-    const savedLang = localStorage.getItem('app_lang') as Language;
-    if (savedLang && (savedLang === 'en' || savedLang === 'zh')) {
-      setLanguageState(savedLang);
+    // Try to get language from local storage, default to 'zh' if not found
+    try {
+      const savedLang = localStorage.getItem('app_lang');
+      if (savedLang === 'en' || savedLang === 'zh') {
+        setLanguageState(savedLang);
+      }
+    } catch (e) {
+      console.warn("Failed to read language preference");
     }
   }, []);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
-    localStorage.setItem('app_lang', lang);
+    try {
+      localStorage.setItem('app_lang', lang);
+    } catch (e) {
+      console.warn("Failed to save language preference");
+    }
   };
 
   const t = (key: string): string => {
