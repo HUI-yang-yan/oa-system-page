@@ -4,6 +4,27 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Enterprise OA System</title>
+    
+    <!-- Global Error Handler: Catches errors before React mounts -->
+    <script>
+      window.onerror = function(message, source, lineno, colno, error) {
+        const errorDiv = document.createElement('div');
+        errorDiv.style.position = 'fixed';
+        errorDiv.style.top = '0';
+        errorDiv.style.left = '0';
+        errorDiv.style.width = '100%';
+        errorDiv.style.backgroundColor = '#fee2e2'; // Red 100
+        errorDiv.style.color = '#991b1b'; // Red 800
+        errorDiv.style.padding = '16px';
+        errorDiv.style.zIndex = '9999';
+        errorDiv.style.fontFamily = 'monospace';
+        errorDiv.style.borderBottom = '1px solid #f87171';
+        errorDiv.innerText = 'Application Crash: ' + message + '\nAt: ' + source + ':' + lineno;
+        document.body.appendChild(errorDiv);
+        console.error('Global Crash:', error);
+      };
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -23,11 +44,11 @@
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.10.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+    "react/": "https://aistudiocdn.com/react@18.3.1/",
+    "react": "https://aistudiocdn.com/react@18.3.1",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@6.28.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@0.294.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@18.3.1/"
   }
 }
 </script>
