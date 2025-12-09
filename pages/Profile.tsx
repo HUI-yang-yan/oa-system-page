@@ -1,23 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Mail, Phone, Briefcase, Key } from 'lucide-react';
 import { useTranslation } from '../utils/i18n';
+import { useAuth } from '../contexts/AuthContext';
 
 const Profile: React.FC = () => {
   const { t } = useTranslation();
-  
-  // Safe user parsing
-  const [user, setUser] = useState<any>({});
-  useEffect(() => {
-    try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          setUser(parsed && typeof parsed === 'object' ? parsed : {});
-        }
-    } catch(e) {
-      setUser({});
-    }
-  }, []);
+  const { user } = useAuth(); // Use Context
 
   return (
     <div className="space-y-6">

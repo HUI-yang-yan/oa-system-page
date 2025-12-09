@@ -1,17 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, getUserProfile } from '../services/api';
+import { login as apiLogin, getUserProfile } from '../services/api'; // Rename api login to avoid conflict
 import { Lock, User } from 'lucide-react';
 import { useTranslation } from '../utils/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
+import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
+  const { login, isAuthenticated } = useAuth(); // Use Context Login
+  const navigate = useNavigate();
+  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,11 +29,11 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const result: any = await login({ username, password });
+      const result: any = await apiLogin({ username, password });
       
       if (result.code === 200 || result.code === 1) {
         let token = '';
-        let user = null;
+        let user: any = null;
 
         if (typeof result.data === 'string') {
           token = result.data;
@@ -33,8 +43,7 @@ const Login: React.FC = () => {
         }
 
         if (token) {
-          localStorage.setItem('token', token);
-          
+          // If we have a token but no user object, try to fetch profile
           if (!user) {
             try {
               const base64Url = token.split('.')[1];
@@ -57,13 +66,14 @@ const Login: React.FC = () => {
             }
           }
 
-          // Defensive Check: Ensure user is a valid object before saving
-          // This prevents "null" being saved to localStorage and crashing the Layout
-          if (!user || typeof user !== 'object') {
+          // Fallback user object
+          if (!user) {
             user = { realName: username, position: 'Employee', id: 0 };
           }
 
-          localStorage.setItem('user', JSON.stringify(user));
+          // Call Context Login (this handles localStorage safely)
+          login(token, user);
+          
           navigate('/');
         } else {
           setError('Login succeeded but no token was received.');
@@ -81,7 +91,6 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
-      {/* Language Switcher Fixed Top Right */}
       <div className="fixed top-4 right-4">
         <LanguageSwitcher />
       </div>

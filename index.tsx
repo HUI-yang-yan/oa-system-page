@@ -16,5 +16,6 @@ try {
   );
 } catch (error) {
   console.error("Failed to mount application:", error);
-  document.body.innerHTML = `<div style="padding: 20px; color: red;"><h1>Failed to start app</h1><pre>${error}</pre></div>`;
+  // Fallback UI
+  rootElement.innerHTML = `<div style="padding: 20px; color: red;"><h1>Failed to start app</h1><p>See console for details.</p></div>`;
 }

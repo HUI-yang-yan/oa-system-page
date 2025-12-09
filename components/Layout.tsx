@@ -14,29 +14,14 @@ import { NavItem } from '../types';
 import { subscribeToApiStatus, API_BASE_URL, ApiStatus } from '../services/api';
 import { useTranslation } from '../utils/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useAuth } from '../contexts/AuthContext';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, logout } = useAuth(); // Use Context
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [apiState, setApiState] = useState<ApiStatus>({ status: 'unknown', error: null });
-  
-  // Safe user parsing to prevent crashes (White Screen fix)
-  const [user, setUser] = useState<any>({});
-  
-  useEffect(() => {
-    try {
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-            const parsed = JSON.parse(storedUser);
-            // Critical Fix: Ensure parsed is an object and not null
-            setUser(parsed && typeof parsed === 'object' ? parsed : {});
-        }
-    } catch (e) {
-        console.warn("Failed to parse user from localstorage");
-        setUser({});
-    }
-  }, []);
 
   useEffect(() => {
     // Subscribe to API connection status
@@ -49,8 +34,7 @@ const Layout: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    logout();
     navigate('/login');
   };
 
