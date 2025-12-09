@@ -23,14 +23,18 @@ const Layout: React.FC = () => {
   
   // Safe user parsing to prevent crashes (White Screen fix)
   const [user, setUser] = useState<any>({});
+  
   useEffect(() => {
     try {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            setUser(JSON.parse(storedUser));
+            const parsed = JSON.parse(storedUser);
+            // Critical Fix: Ensure parsed is an object and not null
+            setUser(parsed && typeof parsed === 'object' ? parsed : {});
         }
     } catch (e) {
         console.warn("Failed to parse user from localstorage");
+        setUser({});
     }
   }, []);
 
@@ -94,8 +98,8 @@ const Layout: React.FC = () => {
               <UserCircle size={20} />
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-slate-800 truncate">{user.realName || 'User'}</p>
-              <p className="text-xs text-slate-500 truncate">{user.position || 'Employee'}</p>
+              <p className="text-sm font-medium text-slate-800 truncate">{user?.realName || 'User'}</p>
+              <p className="text-xs text-slate-500 truncate">{user?.position || 'Employee'}</p>
             </div>
           </div>
           

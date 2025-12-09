@@ -10,8 +10,13 @@ const Profile: React.FC = () => {
   useEffect(() => {
     try {
         const storedUser = localStorage.getItem('user');
-        if (storedUser) setUser(JSON.parse(storedUser));
-    } catch(e) {}
+        if (storedUser) {
+          const parsed = JSON.parse(storedUser);
+          setUser(parsed && typeof parsed === 'object' ? parsed : {});
+        }
+    } catch(e) {
+      setUser({});
+    }
   }, []);
 
   return (
@@ -26,10 +31,10 @@ const Profile: React.FC = () => {
         <div className="col-span-1">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 text-center">
             <div className="w-24 h-24 bg-slate-200 rounded-full mx-auto flex items-center justify-center text-slate-500 text-3xl font-bold mb-4">
-              {user.realName ? user.realName.charAt(0) : 'U'}
+              {user?.realName ? user.realName.charAt(0) : 'U'}
             </div>
-            <h2 className="text-xl font-bold text-slate-800">{user.realName}</h2>
-            <p className="text-secondary mb-4">{user.position}</p>
+            <h2 className="text-xl font-bold text-slate-800">{user?.realName || 'User'}</h2>
+            <p className="text-secondary mb-4">{user?.position || 'Employee'}</p>
             <div className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
               {t('emp.status.active')}
             </div>
@@ -39,13 +44,13 @@ const Profile: React.FC = () => {
             <h3 className="font-semibold text-slate-800 mb-4">{t('profile.contactInfo')}</h3>
             <ul className="space-y-4">
               <li className="flex items-center gap-3 text-sm text-slate-600">
-                <Mail size={16} /> {user.email}
+                <Mail size={16} /> {user?.email || 'N/A'}
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-600">
-                <Phone size={16} /> {user.phone}
+                <Phone size={16} /> {user?.phone || 'N/A'}
               </li>
               <li className="flex items-center gap-3 text-sm text-slate-600">
-                <Briefcase size={16} /> Dept ID: {user.departmentId}
+                <Briefcase size={16} /> Dept ID: {user?.departmentId || 'N/A'}
               </li>
             </ul>
           </div>

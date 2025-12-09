@@ -47,7 +47,7 @@ const Login: React.FC = () => {
                 
                 if (payload.sub) {
                   const profileRes = await getUserProfile(Number(payload.sub));
-                  if (profileRes.code === 200 || profileRes.code === 1) {
+                  if ((profileRes.code === 200 || profileRes.code === 1) && profileRes.data) {
                     user = profileRes.data;
                   }
                 }
@@ -57,7 +57,9 @@ const Login: React.FC = () => {
             }
           }
 
-          if (!user) {
+          // Defensive Check: Ensure user is a valid object before saving
+          // This prevents "null" being saved to localStorage and crashing the Layout
+          if (!user || typeof user !== 'object') {
             user = { realName: username, position: 'Employee', id: 0 };
           }
 

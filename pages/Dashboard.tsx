@@ -25,8 +25,14 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     try {
         const storedUser = localStorage.getItem('user');
-        if (storedUser) setUser(JSON.parse(storedUser));
-    } catch(e) {}
+        if (storedUser) {
+            const parsed = JSON.parse(storedUser);
+            // Ensure parsed is not null
+            setUser(parsed && typeof parsed === 'object' ? parsed : {});
+        }
+    } catch(e) {
+        setUser({});
+    }
   }, []);
 
   // Diagnostic State
@@ -104,7 +110,7 @@ const Dashboard: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">{t('nav.dashboard')}</h1>
-          <p className="text-secondary">{t('dash.welcome')}, {user.realName || 'User'}</p>
+          <p className="text-secondary">{t('dash.welcome')}, {user?.realName || 'User'}</p>
         </div>
         <div className="text-right hidden md:block">
           <div className="text-3xl font-light text-primary">{getTimeString(currentTime)}</div>
