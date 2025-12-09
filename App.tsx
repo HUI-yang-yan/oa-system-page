@@ -8,54 +8,39 @@ import LeaveManagement from './pages/LeaveManagement';
 import Profile from './pages/Profile';
 import ErrorBoundary from './components/ErrorBoundary';
 import { LanguageProvider } from './utils/i18n';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
 
-// Robust Auth Guard using Context
+// Simple Auth Guard
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-slate-50">Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
+  const token = localStorage.getItem('token');
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
-  
-  return <>{children}</>;
+  return children;
 };
-
-const AppRoutes: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      
-      <Route path="/" element={
-        <ProtectedRoute>
-          <Layout />
-        </ProtectedRoute>
-      }>
-        <Route index element={<Dashboard />} />
-        <Route path="employees" element={<EmployeeList />} />
-        <Route path="leave" element={<LeaveManagement />} />
-        <Route path="profile" element={<Profile />} />
-      </Route>
-
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  );
-}
 
 const App: React.FC = () => {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <LanguageProvider>
-          <HashRouter>
-            <AppRoutes />
-          </HashRouter>
-        </LanguageProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Dashboard />} />
+              <Route path="employees" element={<EmployeeList />} />
+              <Route path="leave" element={<LeaveManagement />} />
+              <Route path="profile" element={<Profile />} />
+            </Route>
+
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </HashRouter>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 };

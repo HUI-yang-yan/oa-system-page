@@ -1,27 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as apiLogin, getUserProfile } from '../services/api'; // Rename api login to avoid conflict
+import { login, getUserProfile } from '../services/api';
 import { Lock, User } from 'lucide-react';
 import { useTranslation } from '../utils/i18n';
 import LanguageSwitcher from '../components/LanguageSwitcher';
-import { useAuth } from '../contexts/AuthContext';
 
 const Login: React.FC = () => {
   const { t } = useTranslation();
-  const { login, isAuthenticated } = useAuth(); // Use Context Login
-  const navigate = useNavigate();
-  
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,11 +19,11 @@ const Login: React.FC = () => {
     setError('');
 
     try {
-      const result: any = await apiLogin({ username, password });
+      const result: any = await login({ username, password });
       
       if (result.code === 200 || result.code === 1) {
         let token = '';
-        let user: any = null;
+        let user = null;
 
         if (typeof result.data === 'string') {
           token = result.data;
@@ -43,7 +33,8 @@ const Login: React.FC = () => {
         }
 
         if (token) {
-          // If we have a token but no user object, try to fetch profile
+          localStorage.setItem('token', token);
+          
           if (!user) {
             try {
               const base64Url = token.split('.')[1];
@@ -56,7 +47,7 @@ const Login: React.FC = () => {
                 
                 if (payload.sub) {
                   const profileRes = await getUserProfile(Number(payload.sub));
-                  if ((profileRes.code === 200 || profileRes.code === 1) && profileRes.data) {
+                  if (profileRes.code === 200 || profileRes.code === 1) {
                     user = profileRes.data;
                   }
                 }
@@ -66,14 +57,11 @@ const Login: React.FC = () => {
             }
           }
 
-          // Fallback user object
           if (!user) {
             user = { realName: username, position: 'Employee', id: 0 };
           }
 
-          // Call Context Login (this handles localStorage safely)
-          login(token, user);
-          
+          localStorage.setItem('user', JSON.stringify(user));
           navigate('/');
         } else {
           setError('Login succeeded but no token was received.');
@@ -91,6 +79,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
+      {/* Language Switcher Fixed Top Right */}
       <div className="fixed top-4 right-4">
         <LanguageSwitcher />
       </div>

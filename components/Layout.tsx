@@ -14,14 +14,25 @@ import { NavItem } from '../types';
 import { subscribeToApiStatus, API_BASE_URL, ApiStatus } from '../services/api';
 import { useTranslation } from '../utils/i18n';
 import LanguageSwitcher from './LanguageSwitcher';
-import { useAuth } from '../contexts/AuthContext';
 
 const Layout: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, logout } = useAuth(); // Use Context
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [apiState, setApiState] = useState<ApiStatus>({ status: 'unknown', error: null });
+  
+  // Safe user parsing to prevent crashes (White Screen fix)
+  const [user, setUser] = useState<any>({});
+  useEffect(() => {
+    try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser(JSON.parse(storedUser));
+        }
+    } catch (e) {
+        console.warn("Failed to parse user from localstorage");
+    }
+  }, []);
 
   useEffect(() => {
     // Subscribe to API connection status
@@ -34,7 +45,8 @@ const Layout: React.FC = () => {
   }, []);
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     navigate('/login');
   };
 
@@ -82,8 +94,8 @@ const Layout: React.FC = () => {
               <UserCircle size={20} />
             </div>
             <div className="overflow-hidden">
-              <p className="text-sm font-medium text-slate-800 truncate">{user?.realName || 'User'}</p>
-              <p className="text-xs text-slate-500 truncate">{user?.position || 'Employee'}</p>
+              <p className="text-sm font-medium text-slate-800 truncate">{user.realName || 'User'}</p>
+              <p className="text-xs text-slate-500 truncate">{user.position || 'Employee'}</p>
             </div>
           </div>
           

@@ -12,16 +12,23 @@ import {
 import { signIn, signOut, getMeetingRoomStatus, debugConnection } from '../services/api';
 import { MeetingRoomStatus } from '../types';
 import { useTranslation } from '../utils/i18n';
-import { useAuth } from '../contexts/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
-  const { user } = useAuth(); // Use Context
   const [currentTime, setCurrentTime] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [meetingRooms, setMeetingRooms] = useState<MeetingRoomStatus[]>([]);
   
+  // Safe user parsing
+  const [user, setUser] = useState<any>({});
+  useEffect(() => {
+    try {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) setUser(JSON.parse(storedUser));
+    } catch(e) {}
+  }, []);
+
   // Diagnostic State
   const [showDebug, setShowDebug] = useState(false);
   const [debugResult, setDebugResult] = useState<{
@@ -37,11 +44,12 @@ const Dashboard: React.FC = () => {
       try {
         const roomRes = await getMeetingRoomStatus();
         if (roomRes.code === 200 || roomRes.code === 1) { 
+          // CRITICAL FIX: Ensure data is actually an array before setting state
           if (Array.isArray(roomRes.data)) {
             setMeetingRooms(roomRes.data);
           } else {
             console.warn('API returned non-array data for meeting rooms:', roomRes.data);
-            setMeetingRooms([]);
+            setMeetingRooms([]); // Fallback to empty array
           }
         }
       } catch (e) {
@@ -96,7 +104,7 @@ const Dashboard: React.FC = () => {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">{t('nav.dashboard')}</h1>
-          <p className="text-secondary">{t('dash.welcome')}, {user?.realName || 'User'}</p>
+          <p className="text-secondary">{t('dash.welcome')}, {user.realName || 'User'}</p>
         </div>
         <div className="text-right hidden md:block">
           <div className="text-3xl font-light text-primary">{getTimeString(currentTime)}</div>
@@ -220,6 +228,7 @@ const Dashboard: React.FC = () => {
           <MapPin size={20} /> {t('dash.meetingRooms')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Strict Render Guard: ensure meetingRooms is a valid array before mapping */}
           {!Array.isArray(meetingRooms) || meetingRooms.length === 0 ? (
              <div className="col-span-3 text-center py-8 text-secondary">{t('common.loading')} / {t('emp.noData')}</div>
           ) : (
