@@ -228,7 +228,8 @@ const Dashboard: React.FC = () => {
           <MapPin size={20} /> {t('dash.meetingRooms')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {meetingRooms.length === 0 ? (
+          {/* Strict Render Guard: ensure meetingRooms is a valid array before mapping */}
+          {!Array.isArray(meetingRooms) || meetingRooms.length === 0 ? (
              <div className="col-span-3 text-center py-8 text-secondary">{t('common.loading')} / {t('emp.noData')}</div>
           ) : (
             meetingRooms.map((room) => (

@@ -100,7 +100,7 @@ const EmployeeList: React.FC = () => {
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-slate-500">{t('common.loading')}</td>
                 </tr>
-              ) : workers.length === 0 ? (
+              ) : !Array.isArray(workers) || workers.length === 0 ? (
                 <tr>
                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500">{t('emp.noData')}</td>
                 </tr>
